@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Spring Boot backend service
+  backend:
+    build:
+      context: ./E-Commerce_Backend
+      dockerfile: Dockerfile
+    container_name: ecommerce-backend
+    ports:
+      - "8080:5454"   # Map host port 8080 -> container port 5454
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # Optional MySQL database service
+  db:
+    image: mysql:8
+    container_name: ecommerce-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # React frontend service
+  frontend:
+    build:
+      context: ./E-Commerce_Frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "3000:80"   # Access frontend at http://localhost:3000
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
